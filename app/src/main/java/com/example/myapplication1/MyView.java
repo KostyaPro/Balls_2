@@ -5,35 +5,49 @@ import android.graphics.*;
 import android.view.View;
 
 public class MyView extends View {
-    public MyView(Context context){
-     super(context);
+    int N = 10; // количество шариков
+    float[] x = new float[N];
+    float[] y = new float[N];
+    float[] vx = new float[N];
+    float[] vy = new float[N];
+
+    public MyView(Context context) {
+        super(context);
+
     }
+boolean started=false;
     @Override
         protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         Paint paint = new Paint(); //создаём объект класса Paint
-        paint.setColor(Color.BLUE); //цвет линии
-        paint.setStrokeWidth(5); //толщина линии
-        int x=0,y = 0;
-        while (y<2*canvas.getHeight()||x<2*canvas.getWidth()){
-            canvas.drawLine(0, y,x, 0, paint); //рисуем линию
-            x=x+100;
-            y=y+100;
+        // отрисовываем все шарики
+        if(!started) {
+            for (int i = 0; i < N; i++) {
+                x[i] = (float) (Math.random() * canvas.getWidth());
+                y[i] = (float) (Math.random() * canvas.getHeight());
+                vx[i] = (float) (Math.random() * 6 - 3);
+                vy[i] = (float) (Math.random() * 6 - 3);
+            }
+            started=true;
         }
+        for (int i = 0; i < N; i++) {
+            canvas.drawCircle(x[i], y[i], 20, paint);
+        }
+        // готовим массивы x и у для следущего кадра
+        for (int i = 0; i < N; i++) {
+            x[i] =x[i]+ vx[i];
+            if(x[i]<0||x[i]>canvas.getWidth()){
+                x[i]=-x[i];
+            vx[i]=-vx[i];
+            }
+            y[i] =y[i]+ vy[i];
+            if(y[i]<0||y[i]>canvas.getHeight()){
+                y[i]=-y[i];
+                vy[i]=-vy[i];
+            }
+        }
+        //запрашиваем перерисовку
+        invalidate();
 
-        /*paint.setColor(Color.YELLOW);
-        paint.setStyle(Paint.Style.FILL);
-        canvas.drawCircle(300, 300, 200, paint);
-        paint.setColor(Color.RED);
-        paint.setStyle(Paint.Style.STROKE);
-        paint.setStrokeWidth(20);
-        canvas.drawCircle(300, 300, 200, paint);*/
-
-        /*paint.setColor(Color.LTGRAY);
-        paint.setStyle(Paint.Style.FILL);
-        canvas.drawRect(600, 100, 1000, 400, paint);
-        paint.setColor(Color.BLACK);
-        paint.setStyle(Paint.Style.STROKE);
-        canvas.drawRect(600, 100, 1000, 400, paint);*/
     }
 }
