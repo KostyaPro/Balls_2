@@ -1,53 +1,76 @@
 package com.example.myapplication1;
 
 import android.content.Context;
-import android.graphics.*;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Path;
+import android.graphics.Shader;
 import android.view.View;
 
-public class MyView extends View {
-    int N = 10; // количество шариков
-    float[] x = new float[N];
-    float[] y = new float[N];
-    float[] vx = new float[N];
-    float[] vy = new float[N];
-
-    public MyView(Context context) {
-        super(context);
-
-    }
-boolean started=false;
+class MyGraph extends View {
+    double xe, ye, w;
+    double x, y, h = 0.1;
+    int k = 100;
+    //double xmin = -2 * Math.PI, xmax = 2 * Math.PI;
+    double xmin = -4, xmax = 4;
     @Override
-        protected void onDraw(Canvas canvas) {
-        super.onDraw(canvas);
-        Paint paint = new Paint(); //создаём объект класса Paint
-        // отрисовываем все шарики
-        if(!started) {
-            for (int i = 0; i < N; i++) {
-                x[i] = (float) (Math.random() * canvas.getWidth());
-                y[i] = (float) (Math.random() * canvas.getHeight());
-                vx[i] = (float) (Math.random() * 6 - 3);
-                vy[i] = (float) (Math.random() * 6 - 3);
-            }
-            started=true;
-        }
-        for (int i = 0; i < N; i++) {
-            canvas.drawCircle(x[i], y[i], 20, paint);
-        }
-        // готовим массивы x и у для следущего кадра
-        for (int i = 0; i < N; i++) {
-            x[i] =x[i]+ vx[i];
-            if(x[i]<0||x[i]>canvas.getWidth()){
-                x[i]=-x[i];
-            vx[i]=-vx[i];
-            }
-            y[i] =y[i]+ vy[i];
-            if(y[i]<0||y[i]>canvas.getHeight()){
-                y[i]=-y[i];
-                vy[i]=-vy[i];
-            }
-        }
-        //запрашиваем перерисовку
-        invalidate();
+    protected void onDraw(Canvas canvas) {
 
+        int x0 = this.getWidth() / 2;
+        int y0 = this.getHeight() / 2;
+
+        Paint paint = new Paint();
+        paint.setStrokeWidth(5);
+        paint.setColor(Color.BLACK);
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setTextSize(30.0f);
+
+        canvas.drawLine(x0, 0, x0, this.getHeight(), paint);
+        canvas.drawText("Y", this.getWidth() / 2 + 10, 35, paint);
+        canvas.drawLine(0, y0, this.getWidth(), y0, paint);
+        canvas.drawText("X", this.getWidth() - 50, this.getHeight() / 2 + 50, paint);
+
+        Path path = new Path();
+        boolean first = true;
+        paint.setColor(Color.BLUE);
+        for (x = xmin; x < xmax; x += h) {
+
+            //y=Math.abs(x);
+            y=Math.pow(x,2);
+            // y=Math.tan(x);
+            // y = 3 * Math.sin(x);
+            xe = x0 + k * x;
+            ye = y0 - k * y;
+            if (first) {
+                path.moveTo((float) xe, (float) ye);
+                first = false;
+            } else {
+                path.lineTo((float) xe, (float) ye);
+            }
+            canvas.drawPath(path, paint);
+        }
+        Path path2 = new Path();
+        first = true;
+        paint.setColor(Color.RED);
+        for (x = xmin; x < xmax; x += h) {
+            //y=-x*x+3;
+            // y=Math.tan(x);
+             y = 3 * Math.sin(x);
+            xe = x0 + k * x;
+            ye = y0 - k * y;
+            if (first) {
+                path2.moveTo((float) xe, (float) ye);
+                first = false;
+            }
+            else
+            {
+                path2.lineTo((float) xe, (float) ye);
+            }
+            canvas.drawPath(path2, paint);
+        }
+    }
+    public MyGraph(Context context) {
+        super(context);
     }
 }
